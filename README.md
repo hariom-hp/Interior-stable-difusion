@@ -141,5 +141,21 @@ else:
 
 ## Contributors
 
-- Original Author: [@Trgtuan10](https://github.com/Trgtuan10)
-- Modifications: [@hariom-hp](https://github.com/hariom-hp)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Trgtuan10">
+        <img src="https://github.com/Trgtuan10.png" width="80" alt="Trgtuan10"/><br/>
+        <sub><b>Trgtuan10</b></sub>
+      </a><br/>
+      <sub>Original Author</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/hariom-hp">
+        <img src="https://github.com/hariom-hp.png" width="80" alt="hariom-hp"/><br/>
+        <sub><b>Hariom</b></sub>
+      </a><br/>
+      <sub>Multi-platform Support</sub>
+    </td>
+  </tr>
+</table>
