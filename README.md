@@ -92,6 +92,14 @@ streamlit run streamlit_app
 
 ## What We Did (Modifications)
 
+### Demo: Before & After
+
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/before_test.png" style="flex: 0 0 auto; width: 48%;" alt="Before - Original Room">
+  <img src="assets/after_result.png" style="flex: 0 0 auto; width: 48%;" alt="After - AI Generated Interior">
+</div>
+<p align="center"><i>Left: Original Room | Right: AI-Generated Interior Design</i></p>
+
 ### Multi-Platform Device Support
 
 We added automatic device detection to support multiple hardware configurations:
