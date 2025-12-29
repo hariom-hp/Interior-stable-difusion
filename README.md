@@ -27,11 +27,6 @@ Using Stable Diffusion, this app can make desirable images with three main funct
   <img src="assets/prompt2.png" style="flex: 0 0 auto; width: 48%;">
 </div>
 <p align="center">Prompt: A living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table</p>
-<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
-  <img src="assets/prompt3.png" style="flex: 0 0 auto; width: 48%;">
-  <img src="assets/prompt4.png" style="flex: 0 0 auto; width: 48%;">
-</div>
-<p align="center">Prompt: A large modern kitchen with light grey, brown and white, large kitchen cabinets</p>
 
 ### Fixing style
 
