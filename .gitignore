@@ -1,8 +1,22 @@
+# Python
 .env/
 __pycache__/
-checkpoints/
+*.pyc
+*.pyo
 
+# Model files (too large for git)
+checkpoints/
 *.safetensors
 *.bin
 *.pth
 
+# OS files
+.DS_Store
+
+# Generated images
+*.png
+*.jpg
+*.jpeg
+
+# Logs
+*.log

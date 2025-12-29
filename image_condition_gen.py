@@ -5,17 +5,32 @@ import cv2
 from PIL import Image
 import numpy as np
 
+# Device detection: MPS for Mac, CUDA for NVIDIA, CPU fallback
+if torch.backends.mps.is_available():
+    DEVICE = "mps"
+    DTYPE = torch.float32  # MPS works better with float32
+elif torch.cuda.is_available():
+    DEVICE = "cuda"
+    DTYPE = torch.float16
+else:
+    DEVICE = "cpu"
+    DTYPE = torch.float32
+
 def load_controlnet_model(model_path: str):
     controlnet = ControlNetModel.from_pretrained(
-        "lllyasviel/sd-controlnet-canny", torch_dtype=torch.float16
+        "lllyasviel/sd-controlnet-canny", torch_dtype=DTYPE
     )
     
     pipe_controlnet = StableDiffusionControlNetPipeline.from_single_file(
         model_path,
         controlnet=controlnet, 
         safety_checker=None,
-        torch_dtype=torch.float16
-    ).to("cuda")
+        torch_dtype=DTYPE
+    ).to(DEVICE)
+    
+    # Enable memory optimizations for MPS
+    if DEVICE == "mps":
+        pipe_controlnet.enable_attention_slicing("max")
     
     return pipe_controlnet
 
@@ -48,7 +63,7 @@ def gen_controlnet(pipe_controlnet,
     scheduler = create_scheduler()
     image_control = preprocessor_image(image)
     # image_control.save("control.jpg")
-    generator = torch.Generator(device="cuda").manual_seed(seed)
+    generator = torch.Generator(device=DEVICE).manual_seed(seed)
     
     images = pipe_controlnet(
         prompt=prompt, 

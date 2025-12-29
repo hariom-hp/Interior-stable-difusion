@@ -5,6 +5,17 @@ from diffusers.utils import load_image
 import numpy as np
 import torch
 
+# Device detection: MPS for Mac, CUDA for NVIDIA, CPU fallback
+if torch.backends.mps.is_available():
+    DEVICE = "mps"
+    DTYPE = torch.float32  # MPS works better with float32
+elif torch.cuda.is_available():
+    DEVICE = "cuda"
+    DTYPE = torch.float16
+else:
+    DEVICE = "cpu"
+    DTYPE = torch.float32
+
 # from a image, inpaint it and make a new image that contain optinal object in mask 
 
 def make_inpaint_condition(image, image_mask):
@@ -16,20 +27,20 @@ def make_inpaint_condition(image, image_mask):
     image[image_mask > 0.5] = -1.0  # set as masked pixel
     image = np.expand_dims(image, 0).transpose(0, 3, 1, 2)
     image = torch.from_numpy(image).float()  # converting to float is default, specify if needed
-    image = image.to("cuda", dtype=torch.float16)  # move to GPU as float16
+    image = image.to(DEVICE, dtype=DTYPE)  # move to device
 
-    image_mask = torch.from_numpy(np.expand_dims(image_mask, 0)).to("cuda", dtype=torch.float16)
+    image_mask = torch.from_numpy(np.expand_dims(image_mask, 0)).to(DEVICE, dtype=DTYPE)
 
     return image, image_mask
 
 def load_model_inpaint(model_path: str):
     controlnet = ControlNetModel.from_pretrained(
         'lllyasviel/control_v11p_sd15_inpaint',
-        variant="fp16",
-        torch_dtype=torch.float16,
-    ).to("cuda")
+        variant="fp16" if DEVICE == "cuda" else None,
+        torch_dtype=DTYPE,
+    ).to(DEVICE)
     
-    sd_pipeline = StableDiffusionPipeline.from_single_file(model_path, torch_dtype=torch.float16).to("cuda")
+    sd_pipeline = StableDiffusionPipeline.from_single_file(model_path, torch_dtype=DTYPE).to(DEVICE)
     
     pipe = StableDiffusionControlNetInpaintPipeline(
         vae=sd_pipeline.vae,
@@ -41,7 +52,11 @@ def load_model_inpaint(model_path: str):
         safety_checker=None,
         feature_extractor=sd_pipeline.feature_extractor,
         controlnet=controlnet,
-    ).to('cuda')
+    ).to(DEVICE)
+    
+    # Enable memory optimizations for MPS
+    if DEVICE == "mps":
+        pipe.enable_attention_slicing("max")
     
     return pipe
 
@@ -61,9 +76,9 @@ def inpaint_gen(pipe,
     
     init_image = np.array(init_image.convert("RGB")).astype(np.float32) / 255.0
     init_image = torch.from_numpy(init_image).permute(2, 0, 1).unsqueeze(0)
-    init_image = init_image.to("cuda")
+    init_image = init_image.to(DEVICE)
     
-    generator = torch.Generator(device="cuda").manual_seed(seed)
+    generator = torch.Generator(device=DEVICE).manual_seed(seed)
     images = pipe(
         prompt=prompt,
         negative_prompt=neg,

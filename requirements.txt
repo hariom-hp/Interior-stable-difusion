@@ -10,3 +10,4 @@ streamlit_image_select
 omegaconf
 einops
 streamlit_drawable_canvas
+

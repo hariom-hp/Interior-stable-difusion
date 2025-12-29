@@ -2,10 +2,20 @@ from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 import torch
 from utils_func import create_scheduler
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# Device detection: MPS for Mac, CUDA for NVIDIA, CPU fallback
+if torch.backends.mps.is_available():
+    device = "mps"
+elif torch.cuda.is_available():
+    device = "cuda"
+else:
+    device = "cpu"
 
 def load_model_base(model_path: str):
     pipe = StableDiffusionPipeline.from_single_file(model_path).to(device)
+
+    # Enable memory optimizations for MPS
+    if device == "mps":
+        pipe.enable_attention_slicing("max")
 
     # pipe.load_lora_weights("TrgTuan10/Interior", weight_name="xsarchitectural-7.safetensors", adapter_name="architecture")
     # trigger_words = " ,VERRIERES, DAYLIGHTINDIRECT, LIGHTINGAD, MAGAZINE8K, CINEMATIC LIGHTING, EPIC COMPOSITION"
